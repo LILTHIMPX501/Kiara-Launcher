@@ -90,6 +90,9 @@ fun normalizeName(value: String): String {
 
 // V4.8.3 - Archive portable, aucun acces direct aux dossiers d'autres applications.
 private const val KIARA_BACKUP_MAX_BYTES = 20 * 1024 * 1024
+private const val KIARA_SETTINGS_MAX_BYTES = 1024 * 1024
+private const val KIARA_TOTAL_MAX_BYTES = KIARA_BACKUP_MAX_BYTES + KIARA_SETTINGS_MAX_BYTES
+private const val KIARA_MAX_ZIP_ENTRIES = 2
 private val KIARA_BOOLEAN_KEYS = listOf("dark_theme", "background_enabled", "show_clock", "compact_rows")
 private val KIARA_INT_KEYS = listOf("favorite_columns", "alphabet_size", "wave_intensity", "favorite_icon_size")
 
@@ -125,32 +128,52 @@ private fun exportKiaraBackup(context: Context, uri: Uri) {
 private fun importKiaraBackup(context: Context, uri: Uri) {
     var jsonBytes: ByteArray? = null
     var imageBytes: ByteArray? = null
+    var totalBytes = 0L
+    var entryCount = 0
+    val seenEntries = mutableSetOf<String>()
+
     val input = context.contentResolver.openInputStream(uri) ?: error("Fichier inaccessible")
     input.use { stream ->
         ZipInputStream(stream).use { zip ->
             var entry = zip.nextEntry
             while (entry != null) {
-                if (entry.name == "settings.json" || entry.name == "background.jpg") {
-                    val buffer = ByteArrayOutputStream()
-                    val chunk = ByteArray(8192)
-                    var count = 0
-                    while (true) {
-                        val read = zip.read(chunk)
-                        if (read < 0) break
-                        count += read
-                        require(count <= KIARA_BACKUP_MAX_BYTES) { "Archive trop volumineuse" }
-                        buffer.write(chunk, 0, read)
-                    }
-                    if (entry.name == "settings.json") jsonBytes = buffer.toByteArray()
-                    else imageBytes = buffer.toByteArray()
+                entryCount++
+                require(entryCount <= KIARA_MAX_ZIP_ENTRIES) { "Archive contenant trop de fichiers" }
+                require(!entry.isDirectory && entry.name in setOf("settings.json", "background.jpg")) {
+                    "Fichier inattendu dans la sauvegarde"
                 }
+                require(seenEntries.add(entry.name)) { "Fichier duplique dans la sauvegarde" }
+
+                val entryLimit = if (entry.name == "settings.json") {
+                    KIARA_SETTINGS_MAX_BYTES
+                } else {
+                    KIARA_BACKUP_MAX_BYTES
+                }
+                val buffer = ByteArrayOutputStream()
+                val chunk = ByteArray(8192)
+                var entryBytes = 0L
+                while (true) {
+                    val read = zip.read(chunk)
+                    if (read < 0) break
+                    entryBytes += read.toLong()
+                    totalBytes += read.toLong()
+                    require(entryBytes <= entryLimit && totalBytes <= KIARA_TOTAL_MAX_BYTES) {
+                        "Sauvegarde trop volumineuse"
+                    }
+                    buffer.write(chunk, 0, read)
+                }
+                if (entry.name == "settings.json") jsonBytes = buffer.toByteArray()
+                else imageBytes = buffer.toByteArray()
                 zip.closeEntry()
                 entry = zip.nextEntry
             }
         }
     }
+
     val root = JSONObject((jsonBytes ?: error("settings.json absent")).toString(Charsets.UTF_8))
-    require(root.getString("format") == "kiara-backup" && root.getInt("version") == 1) { "Format de sauvegarde incompatible" }
+    require(root.getString("format") == "kiara-backup" && root.getInt("version") == 1) {
+        "Format de sauvegarde incompatible"
+    }
     val values = root.getJSONObject("settings")
     val favoriteArray = values.getJSONArray("favorites")
     require(favoriteArray.length() <= 2000) { "Trop de favoris" }
@@ -162,21 +185,36 @@ private fun importKiaraBackup(context: Context, uri: Uri) {
     val wave = values.optInt("wave_intensity", 1)
     val iconSize = values.optInt("favorite_icon_size", 1)
     val dim = values.optDouble("background_dim", 0.45).toFloat()
-    require(columns in 3..4 && alphabetSize in listOf(13,16,19) && wave in 0..2 && iconSize in 0..2 && dim.isFinite() && dim in 0f..0.8f) { "Reglages invalides" }
+    require(columns in 3..4 && alphabetSize in listOf(13, 16, 19) && wave in 0..2 &&
+            iconSize in 0..2 && dim.isFinite() && dim in 0f..0.8f) { "Reglages invalides" }
+
     val image = imageBytes
     if (image != null) {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeByteArray(image, 0, image.size, bounds)
-        require(bounds.outWidth in 1..16000 && bounds.outHeight in 1..16000) { "Image de fond invalide" }
+        require(bounds.outWidth in 1..16000 && bounds.outHeight in 1..16000) {
+            "Image de fond invalide"
+        }
+        // Decode a sampled preview to reject corrupt images without allocating a huge bitmap.
+        val sample = (maxOf(bounds.outWidth, bounds.outHeight) / 1600).coerceAtLeast(1)
+        val preview = BitmapFactory.decodeByteArray(
+            image, 0, image.size,
+            BitmapFactory.Options().apply { inSampleSize = sample }
+        ) ?: error("Image de fond illisible")
+        preview.recycle()
     }
+
     val prefs = context.getSharedPreferences("libre_launcher", Context.MODE_PRIVATE)
-    // Ecrire l'image avant les preferences pour ne pas perdre les reglages en cas d'erreur d'E/S.
     val background = File(context.filesDir, "kiara_background.jpg")
+    // Prepare the new file first; only replace the existing background after validation.
     if (image != null) {
         val temp = File(context.filesDir, "kiara_background_import.tmp")
-        temp.writeBytes(image)
-        if (!temp.renameTo(background)) {
-            temp.copyTo(background, overwrite = true)
+        try {
+            temp.writeBytes(image)
+            if (!temp.renameTo(background)) {
+                temp.copyTo(background, overwrite = true)
+            }
+        } finally {
             temp.delete()
         }
     } else if (background.exists()) {
