@@ -1,0 +1,33 @@
+# Android Studio / Gradle
+.gradle/
+.idea/
+*.iml
+local.properties
+**/build/
+build/
+.cxx/
+.externalNativeBuild/
+captures/
+# Signing keys and credentials
+*.jks
+*.keystore
+*.p12
+*.pem
+keystore.properties
+key.properties
+*.env
+.env*
+# OS/editor
+.DS_Store
+Thumbs.db
+*.log
+# Personal backups and exports
+*Kiara_sauvegarde*.zip
+# APK et archives locales
+*.apk
+*.zip
+
+# Exports temporaires
+/exportToHTML/
+# Fichiers generes lors de la publication Release
+/app/release/
