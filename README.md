@@ -32,7 +32,7 @@ Le fonctionnement a été testé sur des appareils Android, notamment pour la na
 
 Pour installer Kiar'a depuis un APK officiel :
 
-1. Télécharger l'APK depuis la section **Releases** du dépôt GitHub, lorsqu'il sera disponible.
+1. Télécharger l'APK officiel **app-release.apk** depuis la [Release Kiar'a v1.0.0](https://github.com/LILTHIMPX501/Kiara-Launcher/releases/tag/v1.0.0).
 2. Autoriser l'installation depuis cette source si Android le demande.
 3. Installer Kiar'a.
 4. Sélectionner Kiar'a comme application d'accueil par défaut dans les paramètres Android.
@@ -103,8 +103,8 @@ Copyright © 2026 Kiara Project.
 
 ## État du projet
 
-**Kiar'a 1.0.0 — Première version publique en préparation.**
+**Kiar'a 1.0.0 — Première version publique disponible.**
 
 Le projet est développé de manière indépendante et a vocation à rester gratuit et open source.
 
-Les contributions, suggestions et signalements de problèmes seront les bienvenus après l'ouverture publique du dépôt.
+Les contributions, suggestions et signalements de problèmes sont les bienvenus via les [Issues GitHub](https://github.com/LILTHIMPX501/Kiara-Launcher/issues).
