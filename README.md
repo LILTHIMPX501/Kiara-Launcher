@@ -1,42 +1,110 @@
 # Kiar'a
 
-**Kiar'a** est un lanceur d'applications Android gratuit, minimaliste et personnalisable, développé en Kotlin avec Jetpack Compose.
+**L'essentiel, simplement.**
+
+Kiar'a est un lanceur d'applications Android (*launcher*) gratuit, open source, minimaliste et personnalisable, développé en **Kotlin avec Jetpack Compose**.
+
+Son objectif est de proposer un écran d'accueil épuré, rapide à utiliser et centré sur les applications essentielles.
 
 ## Fonctionnalités
 
-- Accueil épuré et favoris personnalisables
-- Liste des applications avec index alphabétique et animation Wave
-- Recherche d'applications
-- Personnalisation de l'alphabet, de l'animation et des icônes favorites
-- Thème clair/sombre, horloge et fond d'écran personnel
-- Exportation et importation des préférences et favoris au format ZIP
+- **Accueil minimaliste** avec applications favorites personnalisables.
+- **Organisation des favoris** : ajout, suppression et modification de leur ordre.
+- **Recherche instantanée** parmi les applications installées.
+- **Navigation alphabétique A–Z** avec animation Wave.
+- **Personnalisation** de la taille de l'alphabet, de l'intensité Wave et des icônes favorites.
+- **Thème clair ou sombre**.
+- **Horloge** et affichage compact configurables.
+- **Fond d'écran personnel** avec réglage de l'assombrissement.
+- **Sauvegarde et restauration ZIP** des favoris, des préférences et du fond d'écran.
 
 ## Compatibilité
 
-- Android 10 et versions ultérieures (minSdk 29 dans la version actuelle)
-- Compilation avec Android Studio et le SDK Android adapté au projet
+- **Version :** 1.0.0
+- **Android minimum :** Android 10 (API 29)
+- **Langage :** Kotlin
+- **Interface :** Jetpack Compose
+- **Identifiant Android :** `fr.kiara.launcher`
 
-## Compiler depuis les sources
+Le fonctionnement a été testé sur des appareils Android, notamment pour la navigation, la personnalisation et la restauration des sauvegardes.
 
-1. Cloner le dépôt ou télécharger son archive.
-2. Ouvrir le dossier racine du projet dans Android Studio.
+## Installation
+
+Pour installer Kiar'a depuis un APK officiel :
+
+1. Télécharger l'APK depuis la section **Releases** du dépôt GitHub, lorsqu'il sera disponible.
+2. Autoriser l'installation depuis cette source si Android le demande.
+3. Installer Kiar'a.
+4. Sélectionner Kiar'a comme application d'accueil par défaut dans les paramètres Android.
+
+L'emplacement du réglage de l'application d'accueil peut varier selon le fabricant du téléphone.
+
+## Compilation depuis les sources
+
+1. Cloner ce dépôt GitHub ou télécharger son archive.
+2. Ouvrir le dossier du projet dans **Android Studio**.
 3. Laisser Gradle synchroniser les dépendances.
-4. Exécuter l'application sur un appareil ou générer un APK Debug.
+4. Connecter un appareil Android compatible ou démarrer un émulateur.
+5. Compiler et exécuter l'application.
 
-Les fichiers de signature privés ne sont pas fournis. Pour distribuer une Release, utilisez votre propre clé et conservez-la en sécurité.
+Pour générer un APK Debug :
+
+```powershell
+.\gradlew.bat :app:assembleDebug
+```
+
+Les fichiers privés de signature ne sont pas inclus dans le dépôt. Toute personne souhaitant distribuer sa propre version Release doit utiliser sa propre clé de signature.
 
 ## Sauvegarde et restauration
 
-Dans les paramètres de Kiar'a, utilisez les commandes **Exporter** et **Importer**. Conservez vos sauvegardes hors du stockage privé de l'application avant toute désinstallation. Les applications favorites doivent être installées sur l'appareil de destination.
+Kiar'a permet d'exporter sa configuration dans une archive ZIP contenant :
+
+- `settings.json` : préférences d'affichage, favoris et ordre des favoris.
+- `background.jpg` : image de fond d'écran, lorsqu'elle est présente et incluse dans l'export.
+
+Pour restaurer une sauvegarde, ouvrir les paramètres de Kiar'a et sélectionner **Importer**.
+
+L'importation remplace la configuration actuelle. Il est recommandé de conserver une copie de sauvegarde avant toute restauration ou désinstallation.
+
+Les applications favorites doivent être installées sur l'appareil de destination pour être utilisables.
 
 ## Confidentialité
 
-À documenter et à vérifier avant publication : permissions Android, accès au stockage, comportement des données et éventuelles dépendances tierces. Ne pas publier de sauvegardes personnelles.
+Kiar'a conserve ses préférences et les informations sur les applications favorites dans le stockage privé de l'application Android.
+
+Les données concernées comprennent notamment :
+
+- Les applications favorites et leur ordre.
+- Les préférences d'affichage et de personnalisation.
+- Le thème et les réglages de l'horloge.
+- L'image de fond d'écran éventuellement choisie.
+
+L'application utilise les mécanismes Android de sélection de documents et d'images pour permettre à l'utilisateur de choisir les fichiers à importer ou exporter.
+
+**Le manifeste Release examiné ne demande pas la permission Android `INTERNET`.** Kiar'a n'a pas besoin de cette permission pour ses fonctionnalités principales.
+
+Les sauvegardes ZIP peuvent contenir une image personnelle et des informations sur les applications favorites. Elles doivent être conservées dans un emplacement sûr et ne pas être publiées sans vérification.
+
+## Sécurité
+
+L'importation ZIP comprend des contrôles de format, de taille et de validation des préférences. Les anciennes sauvegardes compatibles avec le format Kiar'a version 1 restent prises en charge.
+
+Ces protections réduisent certains risques liés aux archives incorrectes ou malveillantes, sans constituer une garantie absolue de sécurité.
+
+Les clés privées de signature, les fichiers de configuration locale et les sauvegardes personnelles ne doivent jamais être ajoutés au dépôt public.
 
 ## Licence
 
-Licence à choisir et à ajouter avant publication publique (MIT proposée). Vérifiez les droits sur tous les fichiers, icônes, polices et autres ressources intégrés.
+Kiar'a est distribué sous **licence MIT**.
 
-## Statut
+Consulter le fichier [LICENSE](LICENSE) pour les conditions complètes.
 
-Version de travail validée sur appareils de test : V4.8.3. Publication publique en préparation.
+Copyright © 2026 Kiara Project.
+
+## État du projet
+
+**Kiar'a 1.0.0 — Première version publique en préparation.**
+
+Le projet est développé de manière indépendante et a vocation à rester gratuit et open source.
+
+Les contributions, suggestions et signalements de problèmes seront les bienvenus après l'ouverture publique du dépôt.
