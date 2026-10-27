@@ -1,6 +1,20 @@
+<div align="center">
+
 # Kiar'a
 
-**L'essentiel, simplement.**
+### L'essentiel, simplement.
+
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Android](https://img.shields.io/badge/Android-10%2B-green)
+![Licence](https://img.shields.io/badge/licence-MIT-orange)
+
+**Un launcher Android minimaliste, gratuit et open source.**
+
+### [Télécharger Kiar'a 1.0.0](https://github.com/LILTHIMPX501/Kiara-Launcher/releases/tag/v1.0.0)
+
+</div>
+
+---
 
 Kiar'a est un lanceur d'applications Android (*launcher*) gratuit, open source, minimaliste et personnalisable, développé en **Kotlin avec Jetpack Compose**.
 
